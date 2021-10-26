@@ -35,8 +35,9 @@ jobs:
 
       - name: Create dummy files to release ("build")
         run: |
-          mkdir -p /tmp/results
-          echo "Lorem ipsum this is ${{ steps.get_version.outputs.version }}" > /tmp/results/
+          mkdir -p /tmp/results/
+          echo "Lorem ipsum this is ${{ steps.get_version.outputs.version }}" > /tmp/results/lorem
+          cp foo /tmp/results/
           
       # TODO remove this step once the releases actually work
       - name: Upload artifacts to job

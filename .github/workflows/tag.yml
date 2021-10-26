@@ -7,7 +7,7 @@ on:
       - 'anaconda-*'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   run:

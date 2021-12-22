@@ -39,7 +39,7 @@ jobs:
         # If the version does not fit the regexp, we'll just fail. TODO maybe abort instead?
         run: |
           echo "Checking pushed tag ref ${{ steps.get_ref.outputs.ref }}"
-          VER=$(echo ${{ steps.get_ref.outputs.ref }} | perl -ne '/^refs\/tags\/anaconda-([0-9]+(?:\.[0-9]+){1,3})-1$/ && print "$1\n";')
+          VER=$(echo ${{ steps.get_ref.outputs.ref }} | perl -ne '/^(?:refs\/tags\/)?anaconda-([0-9]+(?:\.[0-9]+){1,3})-1$/ && print "$1\n";')
           if [ -z "$VER" ] ; then
             echo "Tag ref ${{ steps.get_ref.outputs.ref }} is not a valid release tag."
             exit 1

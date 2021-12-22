@@ -28,37 +28,30 @@ jobs:
         run: |
           if [ -n "${{ github.event.inputs.tag-ref }}" ] ; then
             echo "Using manual input: ${{ github.event.inputs.tag-ref }}"
-            echo "RELEASE_REF=${{ github.event.inputs.tag-ref }}" >> $GITHUB_ENV
+            echo "::set-output name=ref::${{ github.event.inputs.tag-ref }}"
           else
             echo "Using automatic input: ${{ github.ref }}"
-            echo "RELEASE_REF=${{ github.ref }}" >> $GITHUB_ENV
+            echo "::set-output name=ref::${{ github.ref }}"
           fi
-          # make sure that something was set
-          if [ -z "${{ env.RELEASE_REF }}" ] ; then
-            echo "Nothing to release!"
-            exit 1
-          fi
-          echo "Result: ${{ env.RELEASE_REF }}"
-          exit 2
 
       - name: Extract version from the tag
         id: get_version
         # If the version does not fit the regexp, we'll just fail. TODO maybe abort instead?
         run: |
-          echo "Checking pushed tag ref ${{ github.ref }}"
-          VER=$(echo ${{ github.ref }} | perl -ne '/^refs\/tags\/anaconda-([0-9]+(?:\.[0-9]+){1,3})-1$/ && print "$1\n";')
+          echo "Checking pushed tag ref ${{ steps.get_ref.outputs.ref }}"
+          VER=$(echo ${{ steps.get_ref.outputs.ref }} | perl -ne '/^refs\/tags\/anaconda-([0-9]+(?:\.[0-9]+){1,3})-1$/ && print "$1\n";')
           if [ -z "$VER" ] ; then
-            echo "Tag ref ${{ github.ref }} is not a valid release tag."
+            echo "Tag ref ${{ steps.get_ref.outputs.ref }} is not a valid release tag."
             exit 1
           else
-            echo "Tag ref ${{ github.ref }} detected as release version $VER."
+            echo "Tag ref ${{ steps.get_ref.outputs.ref }} detected as release version $VER."
             echo "::set-output name=version::$VER"
           fi
 
       - name: Check out repo
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ steps.get_ref.outputs.ref }}
 
       - name: Create dummy files to release ("build")
         run: |
@@ -96,7 +89,7 @@ jobs:
 
           # create release with the release notes
           gh release create \
-            ${{ env.RELEASE_REF }} \
+            ${{ steps.get_ref.outputs.ref }} \
             --draft \
             --title "anaconda-$RELEASE_NAME" \
             --notes-file release.txt \

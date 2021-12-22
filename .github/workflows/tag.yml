@@ -52,6 +52,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ steps.get_ref.outputs.ref }}
+          fetch-depth: 0
 
       - name: Create dummy files to release ("build")
         run: |

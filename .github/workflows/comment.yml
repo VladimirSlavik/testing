@@ -1,0 +1,24 @@
+# React to a comment on PRs
+name: emoji-spammer
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  doit:
+    runs-on: ubuntu-latest
+    steps:
+      - id: spamyspam
+        name: Spam some emoji on the comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run : |
+          set -eux
+          gh api \
+            /repos/VladimirSlavik/testing/pulls/comments/${{ github.event.comment.id }}/reactions \
+            -F content="+1" \
+            --include

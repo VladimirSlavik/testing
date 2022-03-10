@@ -19,6 +19,7 @@ jobs:
         run : |
           set -eux
           gh api \
+            -X POST \
             /repos/VladimirSlavik/testing/pulls/comments/${{ github.event.comment.id }}/reactions \
             -F content="+1" \
             --include

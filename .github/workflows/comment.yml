@@ -18,8 +18,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run : |
           set -eux
-          gh api \
+          echo "+1" | gh api \
             -X POST \
+            --header "Accept:application/vnd.github.v3+json" \
             /repos/VladimirSlavik/testing/pulls/comments/${{ github.event.comment.id }}/reactions \
-            -F content="+1" \
-            --include
+            --include \
+            --input -

@@ -1,0 +1,76 @@
+# React to a comment on PRs
+name: status-poster
+on:
+  issue_comment:
+    types: [created]
+
+permissions: write-all
+#  contents: read
+#  issues: write
+
+jobs:
+
+  pr-info:
+    if: startsWith(github.event.comment.body, '/status-test')
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Get information for pull request
+        uses: octokit/request-action@v2.x
+        id: pr_api
+        with:
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    outputs:
+      sha: ${{ fromJson(steps.pr_api.outputs.data).head.sha }}
+
+  doit:
+    runs-on: ubuntu-latest
+    needs: pr-info
+    steps:
+
+      - name: Get information for pull request
+        uses: octokit/request-action@v2.x
+        id: pr_api
+        with:
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: octokit/request-action@v2.x
+        with:
+          route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
+          context: 'context'
+          description: 'started'
+          state: 'pending'
+          target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          sleep 10
+
+      - uses: octokit/request-action@v2.x
+        with:
+          route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
+          context: 'context'
+          description: 'progress'
+          state: 'pending'
+          target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          sleep 10
+
+      - uses: octokit/request-action@v2.x
+        with:
+          route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
+          context: 'context'
+          description: 'finished'
+          state: ${{ job.status }}
+          target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -74,7 +74,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_NAME: ${{ steps.get_version.outputs.version }}
         run: |
-          echo -e "Anaconda release $RELEASE_NAME.\n\n" > release.txt
+          echo -e "Anaconda release $RELEASE_NAME.\n\nThis a different branch.\n\n" > release.txt
 
           # find version tags
           CURRENT_VERSION="anaconda-$RELEASE_NAME-1"

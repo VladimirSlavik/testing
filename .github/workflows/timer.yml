@@ -1,0 +1,14 @@
+name: Squawk at a given time
+
+on:
+  schedule:
+    - cron: 30 * 19 * *
+  workflow_dispatch:
+
+jobs:
+  squawk:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "squawking from ${{ github.ref }}"
+          date

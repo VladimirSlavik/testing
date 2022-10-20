@@ -1,14 +1,34 @@
 name: Squawk at a given time
 
 on:
-  schedule:
-    - cron: 30 * 20 * *
   workflow_dispatch:
+#  schedule:
+#    - cron: 30 * 20 * *
+#    - cron: 17 15 20 * *
 
 jobs:
   squawk:
     runs-on: ubuntu-latest
     steps:
-      - run: |
+
+      - name: ID self
+        run: |
           echo "squawking from ${{ github.ref }}"
           date
+
+      - name: Check out repo
+        uses: actions/checkout@v3
+        with:
+          ref: "main"
+          fetch-depth: 20
+          tags: true
+
+      - name: Push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          echo "blah" > blah.txt
+          git add blah.txt
+          git commit -a -m "add blah"
+          git tag blah-2
+          git push main --tags
